@@ -59,15 +59,14 @@ let emojiShortcodes = {};
 function getCaretPosition(target) {
 	if (target.isContentEditable) {
 		target.focus();
-		let _range = document.getSelection().getRangeAt(0);
-		let range = _range.cloneRange();
-		let temp = document.createTextNode("\0");
+		const _range = document.getSelection().getRangeAt(0);
+		const range = _range.cloneRange();
+		const temp = document.createTextNode("\0");
 		range.insertNode(temp);
 		const caretposition = target.innerText.indexOf("\0");
 		temp.parentNode.removeChild(temp);
 		return caretposition;
-	}
-	else {
+	} else {
 		return target.selectionStart;
 	}
 }
@@ -161,7 +160,7 @@ function deleteCaret(target, atext) {
 
 			target.selectionStart = start - atext.length;
 			target.selectionEnd = start;
-			target.setRangeText('');
+			target.setRangeText("");
 
 			// Notify any possible listeners of the change
 			const e = document.createEvent("UIEvent");
@@ -186,7 +185,7 @@ function outputLabel(anumber, afraction) {
 	let intpart = Math.trunc(number);
 	const fractionpart = afraction ? parseFloat(afraction) : Math.abs(number % 1);
 
-	let strm = '';
+	let strm = "";
 
 	for (const fraction in fractions) {
 		if (Math.abs(fractionpart - fractions[fraction]) < Number.EPSILON) {
@@ -208,8 +207,7 @@ function outputLabel(anumber, afraction) {
 
 				if (intpart === -1) {
 					strm += "-";
-				}
-				else if (intpart !== 1) {
+				} else if (intpart !== 1) {
 					strm += intpart;
 				}
 
@@ -240,8 +238,9 @@ function firstDifferenceIndex(a, b) {
 		return -1;
 	}
 	let i = 0;
-	while (a[i] === b[i])
+	while (a[i] === b[i]) {
 		++i;
+	}
 	return i;
 }
 
@@ -253,7 +252,7 @@ function firstDifferenceIndex(a, b) {
  */
 function autocorrect(event) {
 	// console.log('keydown', event.key, event.key.length, event.keyCode);
-	if (!((event.key.length === 0 || event.key.length === 1 || event.keyCode === 13 || event.key === 'Unidentified') && !event.ctrlKey && !event.metaKey && !event.altKey)) {
+	if (!((event.key.length === 0 || event.key.length === 1 || event.keyCode === 13 || event.key === "Unidentified") && !event.ctrlKey && !event.metaKey && !event.altKey)) {
 		return;
 	}
 	if (!symbolpatterns) {
@@ -272,23 +271,22 @@ function autocorrect(event) {
 			// White space
 			const re = /^\s*$/;
 			if (insert === "'") {
-				insert = re.test(prevouschar) ? '‘' : '’';
-			}
-			else if (insert === '"') {
-				insert = re.test(prevouschar) ? '“' : '”';
+				insert = re.test(prevouschar) ? "‘" : "’";
+			} else if (insert === '"') {
+				insert = re.test(prevouschar) ? "“" : "”";
 			}
 			deletecount = 1;
 			output = true;
 		}
 		const prevoustext = value.slice(caretposition < (longest + 1) ? 0 : caretposition - (longest + 1), caretposition - 1);
-		let regexResult = symbolpatterns.exec(prevoustext);
+		const regexResult = symbolpatterns.exec(prevoustext);
 		// Autocorrect :colon: Emoji Shortcodes and/or Emoticon Emojis and/or Unicode Symbols
 		if (regexResult) {
 			const text = value.slice(caretposition < longest ? 0 : caretposition - longest, caretposition);
-			let aregexResult = symbolpatterns.exec(text);
-			let aaregexResult = apatterns.exec(text);
+			const aregexResult = symbolpatterns.exec(text);
+			const aaregexResult = apatterns.exec(text);
 			if (!aaregexResult && (!aregexResult || (caretposition <= longest ? regexResult.index < aregexResult.index : regexResult.index <= aregexResult.index))) {
-				insert = autocorrections[regexResult[0]] + (event.keyCode === 13 ? '\n' : insert);
+				insert = autocorrections[regexResult[0]] + (event.keyCode === 13 ? "\n" : insert);
 				deletecount = regexResult[0].length + 1;
 				output = true;
 			}
@@ -298,7 +296,7 @@ function autocorrect(event) {
 				// Emoji Shortcode
 				const re = /:[a-z0-9-+_]+$/;
 				const text = value.slice(caretposition < (longest - 1) ? 0 : caretposition - (longest - 1), caretposition);
-				let regexResult = re.exec(text);
+				const regexResult = re.exec(text);
 				if (regexResult) {
 					const aregexResult = Object.keys(emojiShortcodes).filter((item) => item.indexOf(regexResult[0]) === 0);
 					if (aregexResult.length === 1 && (regexResult[0].length > 2 || aregexResult[0].length === 3)) {
@@ -312,15 +310,15 @@ function autocorrect(event) {
 				// Numbers: https://regex101.com/r/7jUaSP/2
 				const re = /[0-9]+(\.[0-9]+)?$/;
 				const prevoustext = value.slice(0, caretposition - 1);
-				let regexResult = re.exec(prevoustext);
+				const regexResult = re.exec(prevoustext);
 				if (regexResult) {
 					const text = value.slice(0, caretposition);
-					let aregexResult = re.exec(text);
+					const aregexResult = re.exec(text);
 					if (!aregexResult) {
 						const label = outputLabel(regexResult[0], regexResult[1]);
 						const index = firstDifferenceIndex(label, regexResult[0]);
 						if (index >= 0) {
-							insert = label.slice(index) + (event.keyCode === 13 ? '\n' : insert);
+							insert = label.slice(index) + (event.keyCode === 13 ? "\n" : insert);
 							deletecount = regexResult[0].length - index + 1;
 							output = true;
 						}
@@ -410,6 +408,6 @@ function handleError(error) {
 
 browser.runtime.sendMessage({ "type": AUTOCORRECT_CONTENT }).then(handleResponse, handleError);
 browser.runtime.onMessage.addListener(handleResponse);
-window.addEventListener('keydown', undoAutocorrect, true);
-window.addEventListener('keyup', autocorrect, true);
+window.addEventListener("keydown", undoAutocorrect, true);
+window.addEventListener("keyup", autocorrect, true);
 console.log("AwesomeEmoji autocorrect module loaded");
