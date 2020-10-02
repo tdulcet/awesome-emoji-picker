@@ -4,10 +4,10 @@ import * as AddonSettings from "/common/modules/AddonSettings/AddonSettings.js";
 import * as BrowserCommunication from "/common/modules/BrowserCommunication/BrowserCommunication.js";
 
 import { COMMUNICATION_MESSAGE_TYPE } from "/common/modules/data/BrowserCommunicationTypes.js";
-import * as symbols from "/common/modules/data/symbols.js";
+import * as symbols from "/common/modules/data/Symbols.js";
 import * as emojimart from "/common/lib/emoji-mart-embed/dist/emoji-mart.js";
 
-let settings = {
+const settings = {
     autocorrectSymbols: null,
     autocorrectEmojis:  null,
     autocorrectEmojiShortcodes:  null,

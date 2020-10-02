@@ -246,7 +246,7 @@ function firstDifferenceIndex(a, b) {
 }
 
 /**
- * Autocorrect.
+ * Autocorrect on text input even by evaluating the keys and replacing the characters/string.
  *
  * @param {Object} event
  * @returns {void}
@@ -255,6 +255,9 @@ function autocorrect(event) {
 	// console.log('keydown', event.key, event.key.length, event.keyCode);
 	if (!((event.key.length === 0 || event.key.length === 1 || event.keyCode === 13 || event.key === 'Unidentified') && !event.ctrlKey && !event.metaKey && !event.altKey)) {
 		return;
+	}
+	if (!symbolpatterns) {
+		throw new Error("Emoji autocorrect settings have not been received. Do not autocorrect.");
 	}
 	const target = event.target;
 	const caretposition = getCaretPosition(target);
