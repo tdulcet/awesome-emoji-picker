@@ -34,10 +34,7 @@ const defaultSettings = {
     autocorrect: {
         autocorrectEmojis: true,
         autocorrectEmojiShortcodes: true,
-        autocorrectSymbols: true,
         autocompleteEmojiShortcodes: true,
-        autocorrectUnicodeQuotes: false,
-        autocorrectUnicodeFracts: true,
     },
     emojiSearch: {
         enabled: false,

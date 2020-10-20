@@ -1,31 +1,5 @@
 "use strict";
 
-const fractions = Object.freeze({
-	"¼": 1.0 / 4.0,
-	"½": 1.0 / 2.0,
-	"¾": 3.0 / 4.0,
-	"⅐": 1.0 / 7.0,
-	"⅑": 1.0 / 9.0,
-	"⅒": 1.0 / 10.0,
-	"⅓": 1.0 / 3.0,
-	"⅔": 2.0 / 3.0,
-	"⅕": 1.0 / 5.0,
-	"⅖": 2.0 / 5.0,
-	"⅗": 3.0 / 5.0,
-	"⅘": 4.0 / 5.0,
-	"⅙": 1.0 / 6.0,
-	"⅚": 5.0 / 6.0,
-	"⅛": 1.0 / 8.0,
-	"⅜": 3.0 / 8.0,
-	"⅝": 5.0 / 8.0,
-	"⅞": 7.0 / 8.0
-});
-
-const constants = Object.freeze({
-	"π": Math.PI,
-	"e": Math.E
-});
-
 // communication type
 // directly include magic constant as a workaround as we cannot import modules in content scripts due to https://bugzilla.mozilla.org/show_bug.cgi?id=1451545
 const AUTOCORRECT_CONTENT = "autocorrectContent";
@@ -36,8 +10,6 @@ let lastTarget; // Last target
 let lastCaretPosition; // Last caret position
 
 let autocomplete = true;
-let quotes = true;
-let fracts = true;
 
 let autocorrections = {};
 
@@ -171,62 +143,6 @@ function deleteCaret(target, atext) {
 }
 
 /**
- * Convert fractions and constants to Unicode characters.
- * Adapted from: https://github.com/tdulcet/Tables-and-Graphs/blob/master/graphs.hpp
- *
- * @param {number} anumber
- * @param {number} afraction
- * @returns {string}
- */
-function outputLabel(anumber, afraction) {
-	let output = false;
-
-	const number = parseFloat(anumber);
-	let intpart = Math.trunc(number);
-	const fractionpart = afraction ? parseFloat(afraction) : Math.abs(number % 1);
-
-	let strm = "";
-
-	for (const fraction in fractions) {
-		if (Math.abs(fractionpart - fractions[fraction]) < Number.EPSILON) {
-			if (intpart !== 0) {
-				strm += intpart;
-			}
-
-			strm += fraction;
-
-			output = true;
-			break;
-		}
-	}
-
-	if (Math.abs(number) >= Number.EPSILON && !output) {
-		for (const constant in constants) {
-			if (!output && number % constants[constant] === 0) {
-				intpart = number / constants[constant];
-
-				if (intpart === -1) {
-					strm += "-";
-				} else if (intpart !== 1) {
-					strm += intpart;
-				}
-
-				strm += constant;
-
-				output = true;
-				break;
-			}
-		}
-	}
-
-	if (!output) {
-		strm += anumber;
-	}
-
-	return strm;
-}
-
-/**
  * Get first difference index.
  *
  * @param {string} a
@@ -265,19 +181,6 @@ function autocorrect(event) {
 		let deletecount = 0;
 		let insert = value.slice(caretposition - 1, caretposition); // event.key;
 		let output = false;
-		// Use Unicode smart quotes
-		if (quotes && (insert === "'" || insert === '"')) {
-			const prevouschar = value.slice(caretposition < 2 ? 0 : caretposition - 2, caretposition - 1);
-			// White space
-			const re = /^\s*$/;
-			if (insert === "'") {
-				insert = re.test(prevouschar) ? "‘" : "’";
-			} else if (insert === '"') {
-				insert = re.test(prevouschar) ? "“" : "”";
-			}
-			deletecount = 1;
-			output = true;
-		}
 		const prevoustext = value.slice(caretposition < (longest + 1) ? 0 : caretposition - (longest + 1), caretposition - 1);
 		const regexResult = symbolpatterns.exec(prevoustext);
 		// Autocorrect :colon: Emoji Shortcodes and/or Emoticon Emojis and/or Unicode Symbols
@@ -302,26 +205,6 @@ function autocorrect(event) {
 					if (aregexResult.length === 1 && (regexResult[0].length > 2 || aregexResult[0].length === 3)) {
 						insert = aregexResult[0].slice(regexResult[0].length);
 						output = true;
-					}
-				}
-			}
-			// Convert fractions and mathematical constants to Unicode characters
-			if (!output && fracts) {
-				// Numbers: https://regex101.com/r/7jUaSP/2
-				const re = /[0-9]+(\.[0-9]+)?$/;
-				const prevoustext = value.slice(0, caretposition - 1);
-				const regexResult = re.exec(prevoustext);
-				if (regexResult) {
-					const text = value.slice(0, caretposition);
-					const aregexResult = re.exec(text);
-					if (!aregexResult) {
-						const label = outputLabel(regexResult[0], regexResult[1]);
-						const index = firstDifferenceIndex(label, regexResult[0]);
-						if (index >= 0) {
-							insert = label.slice(index) + (event.keyCode === 13 ? "\n" : insert);
-							deletecount = regexResult[0].length - index + 1;
-							output = true;
-						}
 					}
 				}
 			}
@@ -386,8 +269,6 @@ function handleResponse(message, sender) {
 		return;
 	}
 	autocomplete = message.autocomplete;
-	quotes = message.quotes;
-	fracts = message.fracts;
 	autocorrections = message.autocorrections;
 	longest = message.longest;
 	symbolpatterns = message.symbolpatterns;

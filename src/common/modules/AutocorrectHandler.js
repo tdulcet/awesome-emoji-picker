@@ -8,12 +8,9 @@ import * as symbols from "/common/modules/data/Symbols.js";
 import * as emojimart from "/common/lib/emoji-mart-embed/dist/emoji-mart.js";
 
 const settings = {
-    autocorrectSymbols: null,
     autocorrectEmojis:  null,
     autocorrectEmojiShortcodes:  null,
     autocomplete:  null,
-    quotes:  null,
-    fracts:  null,
 };
 
 let autocorrections = {};
@@ -36,9 +33,6 @@ function applySettings() {
     autocorrections = {};
 
     // Add all symbols to our autocorrections map, we want to replace
-    if (settings.autocorrectSymbols) {
-        Object.assign(autocorrections, symbols.symbols);
-    }
     if (settings.autocorrectEmojis) {
         Object.assign(autocorrections, symbols.emojis);
     }
@@ -122,10 +116,7 @@ function onError(error) {
 function setSettings(autocorrect) {
     settings.autocorrectEmojis = autocorrect.autocorrectEmojis;
     settings.autocorrectEmojiShortcodes = autocorrect.autocorrectEmojiShortcodes;
-    settings.autocorrectSymbols = autocorrect.autocorrectSymbols;
     settings.autocomplete = autocorrect.autocompleteEmojiShortcodes;
-    settings.quotes = autocorrect.autocorrectUnicodeQuotes;
-    settings.fracts = autocorrect.autocorrectUnicodeFracts;
 
     applySettings();
 }
@@ -146,8 +137,6 @@ function sendSettings(autocorrect) {
                 {
                     "type": COMMUNICATION_MESSAGE_TYPE.AUTOCORRECT_CONTENT,
                     "autocomplete": settings.autocomplete,
-                    "quotes": settings.quotes,
-                    "fracts": settings.fracts,
                     "autocorrections": autocorrections,
                     "longest": longest,
                     "symbolpatterns": symbolpatterns,
@@ -183,8 +172,6 @@ export async function init() {
             const response = {
                 "type": COMMUNICATION_MESSAGE_TYPE.AUTOCORRECT_CONTENT,
                 "autocomplete": settings.autocomplete,
-                "quotes": settings.quotes,
-                "fracts": settings.fracts,
                 "autocorrections": autocorrections,
                 "longest": longest,
                 "symbolpatterns": symbolpatterns,
