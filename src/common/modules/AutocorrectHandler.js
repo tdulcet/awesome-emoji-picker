@@ -20,7 +20,7 @@ let longest = 0;
 
 let symbolpatterns = [];
 // Do not autocorrect for these patterns
-let apatterns = [];
+let antipatterns = [];
 
 const emojiShortcodes = {};
 
@@ -59,7 +59,7 @@ function applySettings() {
     }
 
     // Do not autocorrect for these patterns
-    apatterns = [];
+    antipatterns = [];
     for (const x in autocorrections) {
         let length = 0;
         let index = x.length;
@@ -82,19 +82,19 @@ function applySettings() {
         if (length > 0) {
             length = x.length - (index + length);
             if (length > 1) {
-                apatterns.push(x.slice(0, -(length - 1)));
+                antipatterns.push(x.slice(0, -(length - 1)));
             }
         }
     }
-    apatterns = apatterns.filter((item, pos) => apatterns.indexOf(item) === pos);
-    console.log("Do not autocorrect for these patterns", apatterns);
+    antipatterns = antipatterns.filter((item, pos) => antipatterns.indexOf(item) === pos);
+    console.log("Do not autocorrect for these patterns", antipatterns);
 
-    apatterns.forEach((symbol, index) => {
-        apatterns[index] = symbol.replace(re, "\\$&");
+    antipatterns.forEach((symbol, index) => {
+        antipatterns[index] = symbol.replace(re, "\\$&");
     });
 
     symbolpatterns = new RegExp(`(${symbolpatterns.join("|")})$`);
-    apatterns = new RegExp(`(${apatterns.join("|")})$`);
+    antipatterns = new RegExp(`(${antipatterns.join("|")})$`);
 }
 
 /**
@@ -140,7 +140,7 @@ function sendSettings(autocorrect) {
                     "autocorrections": autocorrections,
                     "longest": longest,
                     "symbolpatterns": symbolpatterns,
-                    "apatterns": apatterns,
+                    "antipatterns": antipatterns,
                     "emojiShortcodes": emojiShortcodes
                 }
             ).catch(onError);
@@ -175,7 +175,7 @@ export async function init() {
                 "autocorrections": autocorrections,
                 "longest": longest,
                 "symbolpatterns": symbolpatterns,
-                "apatterns": apatterns,
+                "antipatterns": antipatterns,
                 "emojiShortcodes": emojiShortcodes
             };
             // console.log(response);
