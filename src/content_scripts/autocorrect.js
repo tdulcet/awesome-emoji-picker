@@ -182,8 +182,8 @@ function autocorrect(event) {
 		let deletecount = 0;
 		let insert = value.slice(caretposition - 1, caretposition); // event.key;
 		let output = false;
-		const preivousText = value.slice(caretposition < (longest + 1) ? 0 : caretposition - (longest + 1), caretposition - 1);
-		const regexResult = symbolpatterns.exec(preivousText);
+		const previousText = value.slice(caretposition < (longest + 1) ? 0 : caretposition - (longest + 1), caretposition - 1);
+		const regexResult = symbolpatterns.exec(previousText);
 		// Autocorrect :colon: Emoji Shortcodes and/or Emoticon Emojis and/or Unicode Symbols
 		if (regexResult) {
 			const text = value.slice(caretposition < longest ? 0 : caretposition - longest, caretposition);
@@ -290,5 +290,4 @@ browser.runtime.sendMessage({ "type": AUTOCORRECT_CONTENT }).then(handleResponse
 browser.runtime.onMessage.addListener(handleResponse);
 window.addEventListener("keydown", undoAutocorrect, true);
 window.addEventListener("keyup", autocorrect, true);
-console.log("AwesomeEmoji autocorrect module loaded");
 console.log("AwesomeEmoji autocorrect module loaded.");
