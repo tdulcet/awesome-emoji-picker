@@ -30,6 +30,7 @@ let emojiShortcodes = {};
  */
 function getCaretPosition(target) {
 	if (target.isContentEditable) {
+	// ContentEditable elements
 		target.focus();
 		const _range = document.getSelection().getRangeAt(0);
 		const range = _range.cloneRange();
@@ -38,7 +39,9 @@ function getCaretPosition(target) {
 		const caretposition = target.innerText.indexOf("\0");
 		temp.parentNode.removeChild(temp);
 		return caretposition;
-	} else {
+	}
+	// input and textarea fields
+	else {
 		return target.selectionStart;
 	}
 }
@@ -49,6 +52,7 @@ function getCaretPosition(target) {
  *
  * @param {Object} target
  * @param {string} atext
+ * @throws {Error} if nothing is selected
  * @returns {void}
  */
 function insertAtCaret(target, atext) {

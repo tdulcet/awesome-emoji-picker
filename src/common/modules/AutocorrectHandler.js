@@ -52,10 +52,10 @@ function applySettings() {
 
     symbolpatterns = [];
     // Escape special characters
-    const re = /[.*+?^${}()|[\]\\]/g;
+    const regExSpecialChars = /[.*+?^${}()|[\]\\]/g;
 
     for (const symbol in autocorrections) {
-        symbolpatterns.push(symbol.replace(re, "\\$&"));
+        symbolpatterns.push(symbol.replace(regExSpecialChars, "\\$&"));
     }
 
     // Do not autocorrect for these patterns
@@ -90,7 +90,7 @@ function applySettings() {
     console.log("Do not autocorrect for these patterns", antipatterns);
 
     antipatterns.forEach((symbol, index) => {
-        antipatterns[index] = symbol.replace(re, "\\$&");
+        antipatterns[index] = symbol.replace(regExSpecialChars, "\\$&");
     });
 
     symbolpatterns = new RegExp(`(${symbolpatterns.join("|")})$`);

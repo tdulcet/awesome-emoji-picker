@@ -32,7 +32,6 @@ browser.runtime.getBrowserInfo().then((data) => {
 /**
  * Adjust UI if QR code size option is changed.
  *
- * @function
  * @private
  * @param  {boolean} optionValue
  * @param  {string} [option]
@@ -392,7 +391,6 @@ function applyEmojiSearch(optionValue, option, event = {}) {
  *
  * This is basically the "init" method.
  *
- * @function
  * @returns {Promise}
  */
 export async function registerTrigger() {
