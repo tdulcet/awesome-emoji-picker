@@ -89,9 +89,9 @@ function applySettings() {
     antipatterns = antipatterns.filter((item, pos) => antipatterns.indexOf(item) === pos);
     console.log("Do not autocorrect for these patterns", antipatterns);
 
-    antipatterns.forEach((symbol, index) => {
+    for (const [index, symbol] of antipatterns.entries()) {
         antipatterns[index] = symbol.replace(regExSpecialChars, "\\$&");
-    });
+    }
 
     symbolpatterns = new RegExp(`(${symbolpatterns.join("|")})$`);
     antipatterns = new RegExp(`(${antipatterns.join("|")})$`);
@@ -159,7 +159,15 @@ export async function init() {
 
     for (const key in emojiMart.emojiIndex.emojis) {
         const emoji = emojiMart.emojiIndex.emojis[key];
-        emojiShortcodes[emoji.colons] = emoji.native;
+        if (!emoji.native) {
+            /* for (const key in emoji) {
+				const aemoji = emoji[key];
+				emojiShortcodes[aemoji.colons] = aemoji.native;
+			} */
+            emojiShortcodes[emoji[1].colons] = emoji[1].native;
+        } else {
+            emojiShortcodes[emoji.colons] = emoji.native;
+        }
     }
 
     Object.freeze(emojiShortcodes);
