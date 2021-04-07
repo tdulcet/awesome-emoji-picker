@@ -160,10 +160,6 @@ export async function init() {
     for (const key in emojiMart.emojiIndex.emojis) {
         const emoji = emojiMart.emojiIndex.emojis[key];
         if (!emoji.native) {
-            /* for (const key in emoji) {
-				const aemoji = emoji[key];
-				emojiShortcodes[aemoji.colons] = aemoji.native;
-			} */
             emojiShortcodes[emoji[1].colons] = emoji[1].native;
         } else {
             emojiShortcodes[emoji.colons] = emoji.native;
