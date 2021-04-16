@@ -51,10 +51,6 @@
     "description": "The message shown, when the options of the settings could not have been reset."
   },
 
-  "errorPermissionMissing": {
-    "message": "Eine Berechtigung wird für diese Aktion benötigt.",
-    "description": "The message shown, when a required permission is missing. (If) It is not important to mention, which one is missing."
-  },
   "messageOpenOptionsButton": {
     "message": "Optionen öffnen",
     "description": "The text of a button that opens the options page."
@@ -131,7 +127,7 @@
     "description": "The message, which appears, when settings are pre-defined (as managed options) by administrators."
   },
   "optionIsDisabledBecauseManaged": {
-    "message": "Diese option ist deaktiviert, weil sie von deinem Systemadministrator festgelegt wurde.",
+    "message": "Diese Option ist deaktiviert, weil sie von deinem Systemadministrator festgelegt wurde.",
     "description": "The title (tooltip) shown, when hovering over a disabled, managed option."
   },
   "optionLearnMore": {

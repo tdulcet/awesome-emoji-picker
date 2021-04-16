@@ -62,11 +62,6 @@
         "description": "The message shown, when the options of the settings could not have been reset.",
         "hash": "76e950d2db72a824482411ca6564fb1f"
     },
-    "errorPermissionMissing": {
-        "message": "הרשאה חסרה לביצוע פעולה זו.",
-        "description": "The message shown, when a required permission is missing. (If) It is not important to mention, which one is missing.",
-        "hash": "4fd643fe1cc78041711623903d3437a1"
-    },
     "messageOpenOptionsButton": {
         "message": "הצג אפשרויות",
         "description": "The text of a button that opens the options page.",
@@ -310,7 +305,7 @@
         "hash": "e8353da70f0d16d742c92fac598b5d01"
     },
     "optionCopyEmojiColons": {
-        "message": "השתמש ב- $COLON$ Code במקום ב- Unicode.",
+        "message": "השתמש בקוד $COLON$ במקום ב-Unicode.",
         "description": "This is an option shown in the add-on settings. You can also translate 'code' with 'syntax'.",
         "placeholders": {
             "colon": { "content": "$1", "example": "<code>:colon:</code>" }
@@ -386,7 +381,7 @@
         "hash": "3471458865aafdd0f3335877239d5d91"
     },
     "translatorCredit": {
-        "message": "הרחבה זו תורגמה לעברית ע\"י $TRANSLATOR$.",
+        "message": "הרחבה זו תורגמה לעברית ע\"י $TRANSLATORS$.",
         "description": "The credit text for the translator. See https://github.com/TinyWebEx/common/blob/master/CONTRIBUTING.md#translator-credit-inside-of-add-on for how to translate this.",
         "placeholders": {
             "translators": { "content": "$1", "example": "<a href=\"https://github.com/rugk/\">@rugk</a>" }
@@ -424,7 +419,7 @@
 
     // emoji-search
     "searchTipDescription": {
-        "message": "חפש אמוג'י בעזרת $ADDON§...",
+        "message": "חפש אמוג'י בעזרת $ADDON$...",
         "description": "This is the text that is shown when searching for an emoji. It shows a tip to remind the user how to search for an emoji.",
         "placeholders": {
             "addon": { "content": "$1", "example": "The name of the extension. See extensionName." }

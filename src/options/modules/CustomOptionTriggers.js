@@ -19,15 +19,8 @@ const CLIPBOARD_WRITE_PERMISSION = {
 const TABS_PERMISSION = {
     permissions: ["tabs"]
 };
-const MESSAGE_EMOJI_COPY_PERMISSION_FALLBACK = "emojiCopyOnlyFallbackPermissionInfo";
 const MESSAGE_EMOJI_COPY_PERMISSION_SEARCH = "searchActionCopyPermissionInfo";
 const MESSAGE_TABS_PERMISSION = "tabsPermissionInfo";
-
-// cache Firefox version
-let currentBrowserData = "";
-browser.runtime.getBrowserInfo().then((data) => {
-    currentBrowserData = data;
-});
 
 /**
  * Adjust UI if QR code size option is changed.
@@ -71,7 +64,7 @@ function saveEmojiSet(param) {
  * @param  {Object} [event]
  * @returns {Promise}
  */
-function applyPickerResultPermissions(optionValue, option, event) {
+function applyPickerResultPermissions(optionValue) {
     let retPromise;
 
     // switch status of sub-child
@@ -79,30 +72,6 @@ function applyPickerResultPermissions(optionValue, option, event) {
         document.getElementById("emojiCopyOnlyFallback").disabled = false;
     } else {
         document.getElementById("emojiCopyOnlyFallback").disabled = true;
-    }
-
-    // do not require clipboardCopy permission for Firefox >= 74
-    // ref https://github.com/rugk/awesome-emoji-picker/issues/90
-    if (currentBrowserData.name === "Firefox" &&
-        currentBrowserData.version.startsWith("74.")) {
-        return retPromise;
-    }
-
-    if (optionValue.emojiCopy && // only if actually enabled
-        optionValue.emojiCopyOnlyFallback && // if we require a permission
-        !PermissionRequest.isPermissionGranted(CLIPBOARD_WRITE_PERMISSION) // and not already granted
-    ) {
-        retPromise = PermissionRequest.requestPermission(
-            CLIPBOARD_WRITE_PERMISSION,
-            MESSAGE_EMOJI_COPY_PERMISSION_FALLBACK,
-            event
-        ).catch(() => {
-            // if permission is rejected (user declined), force disabling the setting
-            optionValue.emojiCopyOnlyFallback = false;
-            document.getElementById("emojiCopyOnlyFallback").checked = false;
-        });
-    } else {
-        PermissionRequest.cancelPermissionPrompt(CLIPBOARD_WRITE_PERMISSION, MESSAGE_EMOJI_COPY_PERMISSION_FALLBACK);
     }
 
     return retPromise;
@@ -414,12 +383,6 @@ export async function registerTrigger() {
     AutomaticSettings.Trigger.registerAfterLoad(AutomaticSettings.Trigger.RUN_ALL_SAVE_TRIGGER);
 
     // permission request init
-    await PermissionRequest.registerPermissionMessageBox(
-        CLIPBOARD_WRITE_PERMISSION,
-        MESSAGE_EMOJI_COPY_PERMISSION_FALLBACK,
-        document.getElementById("emojiCopyOnlyFallbackPermissionInfo"),
-        "permissionRequiredClipboardWrite"
-    );
     await PermissionRequest.registerPermissionMessageBox(
         CLIPBOARD_WRITE_PERMISSION,
         MESSAGE_EMOJI_COPY_PERMISSION_SEARCH,
