@@ -11,6 +11,7 @@ const settings = {
     autocorrectEmojis:  null,
     autocorrectEmojiShortcodes:  null,
     autocomplete:  null,
+    autocompleteSelect:  null,
 };
 
 let autocorrections = {};
@@ -117,6 +118,7 @@ function setSettings(autocorrect) {
     settings.autocorrectEmojis = autocorrect.autocorrectEmojis;
     settings.autocorrectEmojiShortcodes = autocorrect.autocorrectEmojiShortcodes;
     settings.autocomplete = autocorrect.autocompleteEmojiShortcodes;
+    settings.autocompleteSelect = autocorrect.autocompleteSelect;
 
     applySettings();
 }
@@ -137,6 +139,7 @@ function sendSettings(autocorrect) {
                 {
                     "type": COMMUNICATION_MESSAGE_TYPE.AUTOCORRECT_CONTENT,
                     "autocomplete": settings.autocomplete,
+                    "autocompleteSelect": settings.autocompleteSelect,
                     "autocorrections": autocorrections,
                     "longest": longest,
                     "symbolpatterns": symbolpatterns,
@@ -176,6 +179,7 @@ export async function init() {
             const response = {
                 "type": COMMUNICATION_MESSAGE_TYPE.AUTOCORRECT_CONTENT,
                 "autocomplete": settings.autocomplete,
+                "autocompleteSelect": settings.autocompleteSelect,
                 "autocorrections": autocorrections,
                 "longest": longest,
                 "symbolpatterns": symbolpatterns,

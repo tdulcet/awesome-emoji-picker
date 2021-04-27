@@ -18,7 +18,7 @@ export async function insertIntoPage(text) {
         active: true
     });
 
-    const promises = tabs.map(async (tab) => {
+    const promises = tabs.map(/* async */ (tab) => {
         /* // make sure content script is inserted
         await browser.tabs.executeScript(tab.id, {
             code: "insertIntoPage;",

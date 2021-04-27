@@ -10,6 +10,7 @@ let lastTarget; // Last target
 let lastCaretPosition; // Last caret position
 
 let autocomplete = true;
+let autocompleteSelect = false;
 
 let autocorrections = {};
 
@@ -33,6 +34,9 @@ function getCaretPosition(target) {
 	// ContentEditable elements
 		target.focus();
 		const _range = document.getSelection().getRangeAt(0);
+		if (!_range.collapsed) {
+			return null;
+		}
 		const range = _range.cloneRange();
 		const temp = document.createTextNode("\0");
 		range.insertNode(temp);
@@ -42,6 +46,9 @@ function getCaretPosition(target) {
 	}
 	// input and textarea fields
 	else {
+		if (target.selectionStart !== target.selectionEnd) {
+			return null;
+		}
 		return target.selectionStart;
 	}
 }
@@ -56,9 +63,9 @@ function getCaretPosition(target) {
  * @returns {void}
  */
 function insertAtCaret(target, atext) {
-	const isSuccess = document.execCommand("insertText", false, atext);
-
-	if(isSuccess) {
+	// document.execCommand is deprecated, although there is not yet an alternative: https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand
+	// insertReplacementText
+	if(document.execCommand("insertText", false, atext)) {
 		return;
 	}
 
@@ -82,6 +89,26 @@ function insertAtCaret(target, atext) {
 	}
 
 	throw new Error("nothing selected");
+}
+
+/**
+ * Insert at caret in the given element and select.
+ *
+ * @param {Object} target
+ * @param {string} atext
+ * @returns {void}
+ */
+function insertAndSelect(target, atext) {
+	insertAtCaret(target, atext);
+	// ContentEditable elements
+	if (target.isContentEditable) {
+		const range = document.getSelection().getRangeAt(0);
+		range.setStart(range.startContainer, range.startOffset - atext.length);
+	}
+	// input and textarea fields
+	else {
+		target.selectionStart -= atext.length;
+	}
 }
 
 /**
@@ -124,8 +151,8 @@ function countChars(str) {
 function deleteCaret(target, atext) {
 	const count = countChars(atext);
 	if (count > 0) {
-		const isSuccess = document.execCommand("delete", false);
-		if (isSuccess) {
+		// document.execCommand is deprecated, although there is not yet an alternative: https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand
+		if (document.execCommand("delete", false)) {
 			for (let i = 0; i < count - 1; ++i) {
 				document.execCommand("delete", false);
 			}
@@ -207,9 +234,14 @@ function autocorrect(event) {
 				const regexResult = re.exec(text);
 				if (regexResult) {
 					const aregexResult = Object.keys(emojiShortcodes).filter((item) => item.indexOf(regexResult[0]) === 0);
-					if (aregexResult.length === 1 && (regexResult[0].length > 2 || aregexResult[0].length === 3)) {
-						insert = aregexResult[0].slice(regexResult[0].length);
-						output = true;
+					if (aregexResult.length >= 1 && (regexResult[0].length > 2 || aregexResult[0].length === 3)) {
+						const ainsert = aregexResult[0].slice(regexResult[0].length);
+						if (autocompleteSelect || aregexResult.length > 1) {
+							insertAndSelect(target, ainsert);
+						} else {
+							insert = ainsert;
+							output = true;
+						}
 					}
 				}
 			}
@@ -272,6 +304,7 @@ function handleResponse(message, sender) {
 		return;
 	}
 	autocomplete = message.autocomplete;
+	autocompleteSelect = message.autocompleteSelect;
 	autocorrections = message.autocorrections;
 	longest = message.longest;
 	symbolpatterns = message.symbolpatterns;

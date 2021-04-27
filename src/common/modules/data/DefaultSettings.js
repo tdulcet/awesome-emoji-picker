@@ -35,6 +35,7 @@ const defaultSettings = {
         autocorrectEmojis: true,
         autocorrectEmojiShortcodes: true,
         autocompleteEmojiShortcodes: true,
+        autocompleteSelect: false,
     },
     emojiSearch: {
         enabled: false,
