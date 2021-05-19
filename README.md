@@ -54,21 +54,21 @@ See:
 * Display the emojis in the design of Apple, Google, Twitter, Facebook or just the native style your browser uses.
 * Quickly search for any emoji with many keywords.
 * Search for emojis [directly in the address bar](https://github.com/rugk/awesome-emoji-picker/wiki/FAQ#how-to-use-the-address-bar-to-search-for-emojis).
-* Supports the dark/black mode of your system automatically.
-* Copy emoji to your clipboard.
-* …or directly insert it into the page.
+* Supports the light/dark mode of your system automatically.
+* Copy the emoji to your clipboard.
+* …or directly insert it into the current page.
 * Remembers frequently used emojis.
 * Emoji skin tone is adjustable and is remembered.
-* You can also insert the emoji's `:colon:` syntax instead of the Unicode emoji that is used by default.
+* You can also insert the emoji's `:colon:` shortcode syntax instead of the Unicode emoji that is used by default.
 * Use the hot key (by default <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Period</kbd>) to quickly access the emoji picker.
 * Integrates into Firefox Sync, so you have all your emojis/settings on all devices.
 * Adjust the style and many other options to your liking.
-* The size of the whole emoji picker and the emojis itself is also adjustable.
+* The size of the whole emoji picker and the emojis themselves is also adjustable.
 * Use a colored toolbar icon or a decent monochrome (black/white) one.
 * Follows the [Firefox Photon Design](https://design.firefox.com/photon).
-* It does not violate your privacy and does send data anywhere.
+* Puts your privacy first and does not send data anywhere.
 * Compatible with Firefox for Android
-* Translated in English and German already. [Contribute your own language!](CONTRIBUTING.md#Translations)
+* Translated into several languages already. [Contribute your own language!](CONTRIBUTING.md#Translations)
 * Settings can be managed by your administrator. (see [issue #4](https://github.com/rugk/awesome-emoji-picker/issues/4))
 
 ## Contribute
