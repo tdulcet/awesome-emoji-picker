@@ -8,6 +8,7 @@ import * as symbols from "/common/modules/data/Symbols.js";
 import * as emojimart from "/common/lib/emoji-mart-embed/dist/emoji-mart.js";
 
 const settings = {
+    enabled:  null,
     autocorrectEmojis:  null,
     autocorrectEmojiShortcodes:  null,
     autocomplete:  null,
@@ -20,7 +21,7 @@ let autocorrections = {};
 let longest = 0;
 
 let symbolpatterns = [];
-// Do not autocorrect for these patterns
+// Exceptions, do not autocorrect for these patterns
 let antipatterns = [];
 
 const emojiShortcodes = {};
@@ -110,12 +111,15 @@ function onError(error) {
  * @returns {void}
  */
 function setSettings(autocorrect) {
+    settings.enabled = autocorrect.enabled;
     settings.autocorrectEmojis = autocorrect.autocorrectEmojis;
     settings.autocorrectEmojiShortcodes = autocorrect.autocorrectEmojiShortcodes;
     settings.autocomplete = autocorrect.autocompleteEmojiShortcodes;
     settings.autocompleteSelect = autocorrect.autocompleteSelect;
 
-    applySettings();
+    if (settings.enabled) {
+        applySettings();
+    }
 }
 
 /**
@@ -133,6 +137,7 @@ function sendSettings(autocorrect) {
                 tab.id,
                 {
                     "type": COMMUNICATION_MESSAGE_TYPE.AUTOCORRECT_CONTENT,
+                    "enabled": settings.enabled,
                     "autocomplete": settings.autocomplete,
                     "autocompleteSelect": settings.autocompleteSelect,
                     "autocorrections": autocorrections,
@@ -173,6 +178,7 @@ export async function init() {
         if (message.type === COMMUNICATION_MESSAGE_TYPE.AUTOCORRECT_CONTENT) {
             const response = {
                 "type": COMMUNICATION_MESSAGE_TYPE.AUTOCORRECT_CONTENT,
+                "enabled": settings.enabled,
                 "autocomplete": settings.autocomplete,
                 "autocompleteSelect": settings.autocompleteSelect,
                 "autocorrections": autocorrections,

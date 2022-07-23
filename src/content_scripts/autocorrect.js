@@ -9,6 +9,7 @@ let deletedText; // Last deleted text
 let lastTarget; // Last target
 let lastCaretPosition; // Last caret position
 
+let enabled = false;
 let autocomplete = true;
 let autocompleteSelect = false;
 
@@ -18,7 +19,7 @@ let longest = 0;
 
 // Regular expressions
 let symbolpatterns = null;
-// Do not autocorrect for these patterns
+// Exceptions, do not autocorrect for these patterns
 let antipatterns = null;
 
 let emojiShortcodes = {};
@@ -30,8 +31,8 @@ let emojiShortcodes = {};
  * @returns {number}
  */
 function getCaretPosition(target) {
-	if (target.isContentEditable || document.designMode === "on") {
 	// ContentEditable elements
+	if (target.isContentEditable || document.designMode === "on") {
 		target.focus();
 		const _range = document.getSelection().getRangeAt(0);
 		if (!_range.collapsed) {
@@ -198,9 +199,8 @@ function firstDifferenceIndex(a, b) {
  * @returns {void}
  */
 function autocorrect(event) {
-	// console.log('keydown', event.key, event.key.length, event.keyCode);
-	// Exclude all keys that do not produce a single Unicode character
-	if (!((event.key.length === 0 || event.key.length === 1 || event.keyCode === 13 || event.key === "Unidentified") && !event.ctrlKey && !event.metaKey && !event.altKey)) {
+	// console.log('beforeinput', event.inputType, event.data);
+	if (!(event.inputType === "insertText" || event.inputType === "insertCompositionText" || event.inputType === "insertParagraph" || event.inputType === "insertLineBreak")) {
 		return;
 	}
 	if (!symbolpatterns) {
@@ -211,18 +211,20 @@ function autocorrect(event) {
 	if (caretposition) {
 		const value = target.value || target.innerText;
 		let deletecount = 0;
-		let insert = value.slice(caretposition - 1, caretposition); // event.key;
+		let insert = event.inputType === "insertLineBreak" || event.inputType === "insertParagraph" ? "\n" : event.data;
+		const inserted = insert;
 		let output = false;
-		const previousText = value.slice(caretposition < (longest + 1) ? 0 : caretposition - (longest + 1), caretposition - 1);
+		const previousText = value.slice(caretposition < longest ? 0 : caretposition - longest, caretposition);
 		const regexResult = symbolpatterns.exec(previousText);
 		// Autocorrect :colon: Emoji Shortcodes and/or Emoticon Emojis and/or Unicode Symbols
 		if (regexResult) {
-			const text = value.slice(caretposition < longest ? 0 : caretposition - longest, caretposition);
+			const length = longest - 1;
+			const text = value.slice(caretposition < length ? 0 : caretposition - length, caretposition) + inserted;
 			const aregexResult = symbolpatterns.exec(text);
 			const aaregexResult = antipatterns.exec(text);
 			if (!aaregexResult && (!aregexResult || (caretposition <= longest ? regexResult.index < aregexResult.index : regexResult.index <= aregexResult.index))) {
-				insert = autocorrections[regexResult[0]] + (event.keyCode === 13 ? "\n" : insert);
-				deletecount = regexResult[0].length + 1;
+				insert = autocorrections[regexResult[0]] + inserted;
+				deletecount = regexResult[0].length;
 				output = true;
 			}
 		} else {
@@ -230,7 +232,8 @@ function autocorrect(event) {
 			if (autocomplete) {
 				// Emoji Shortcode
 				const re = /:[a-z0-9-+_]+$/;
-				const text = value.slice(caretposition < (longest - 1) ? 0 : caretposition - (longest - 1), caretposition);
+				const length = longest - 2;
+				const text = value.slice(caretposition < length ? 0 : caretposition - length, caretposition) + inserted;
 				const regexResult = re.exec(text);
 				if (regexResult) {
 					const aregexResult = Object.keys(emojiShortcodes).filter((item) => item.indexOf(regexResult[0]) === 0);
@@ -247,13 +250,17 @@ function autocorrect(event) {
 			}
 		}
 		if (output) {
-			const text = value.slice(caretposition - deletecount, caretposition);
-			deleteCaret(target, text);
+			event.preventDefault();
+
+			const text = deletecount ? value.slice(caretposition - deletecount, caretposition) : "";
+			if (text) {
+				deleteCaret(target, text);
+			}
 			insertAtCaret(target, insert);
-			console.debug("Autocorrect: “%s” was replaced with “%s”.", text, insert);
 
 			insertedText = insert;
-			deletedText = text;
+			deletedText = text + inserted;
+			console.debug("Autocorrect: “%s” was replaced with “%s”.", deletedText, insertedText);
 
 			lastTarget = target;
 			lastCaretPosition = caretposition - deletecount + insert.length;
@@ -268,9 +275,9 @@ function autocorrect(event) {
  * @returns {void}
  */
 function undoAutocorrect(event) {
-	// console.log('keyup', event.key, event.key.length, event.keyCode);
+	// console.log('beforeinput', event.inputType, event.data);
 	// Backspace
-	if (!(event.keyCode === 8 && !event.ctrlKey && !event.metaKey && !event.altKey)) {
+	if (event.inputType !== "deleteContentBackward") {
 		return;
 	}
 	const target = event.target;
@@ -280,6 +287,7 @@ function undoAutocorrect(event) {
 			event.preventDefault();
 
 			if (insertedText) {
+				lastTarget = null;
 				deleteCaret(target, insertedText);
 			}
 			if (deletedText) {
@@ -287,9 +295,9 @@ function undoAutocorrect(event) {
 			}
 			console.debug("Undo autocorrect: “%s” was replaced with “%s”.", insertedText, deletedText);
 		}
-	}
 
-	lastTarget = null;
+		lastTarget = null;
+	}
 }
 
 /**
@@ -303,6 +311,7 @@ function handleResponse(message, sender) {
 	if (message.type !== AUTOCORRECT_CONTENT) {
 		return;
 	}
+	enabled = message.enabled;
 	autocomplete = message.autocomplete;
 	autocompleteSelect = message.autocompleteSelect;
 	autocorrections = message.autocorrections;
@@ -311,6 +320,14 @@ function handleResponse(message, sender) {
 	antipatterns = message.antipatterns;
 	emojiShortcodes = message.emojiShortcodes;
 	// console.log(message);
+
+	if (enabled) {
+		window.addEventListener("beforeinput", undoAutocorrect, true);
+		window.addEventListener("beforeinput", autocorrect, true);
+	} else {
+		window.removeEventListener("beforeinput", undoAutocorrect, true);
+		window.removeEventListener("beforeinput", autocorrect, true);
+	}
 }
 
 /**
@@ -325,6 +342,4 @@ function handleError(error) {
 
 browser.runtime.sendMessage({ "type": AUTOCORRECT_CONTENT }).then(handleResponse, handleError);
 browser.runtime.onMessage.addListener(handleResponse);
-window.addEventListener("keydown", undoAutocorrect, true);
-window.addEventListener("keyup", autocorrect, true);
 console.log("AwesomeEmoji autocorrect module loaded.");

@@ -179,32 +179,44 @@
 
 					<li>
 						<div class="line">
-							<input class="setting save-on-change" type="checkbox" id="autocorrectEmojiShortcodes" data-optiongroup="autocorrect" name="autocorrectEmojiShortcodes">
-							<label data-i18n="" data-opt-i18n-keep-children for="autocorrectEmojiShortcodes">Autocorrect <code data-i18n="__MSG_optionCopyEmojiColonsCode__">:colon:</code>Emoji Shortcodes</label>
+							<input class="setting save-on-change" type="checkbox" id="autocorrect" data-optiongroup="autocorrect" name="enabled">
+							<label for="autocorrect">Enable autocorrection</label>
 						</div>
-						<span data-i18n="" class="line indent helper-text">For example, this will replace <code>:smiley:</code>with 😃 and <code>:apple:</code>with 🍎.</span>
+						<span class="line indent helper-text">Enable the experimental Enoji autocorrection feature. ⚠️ This is for testing only.</span>
 					</li>
 
 					<li>
-						<div class="line">
-							<input class="setting save-on-change" type="checkbox" id="autocorrectEmojis" data-optiongroup="autocorrect" name="autocorrectEmojis">
-							<label data-i18n="" for="autocorrectEmojis">Autocorrect Emoticon Emojis</label>
-						</div>
-						<span data-i18n="" class="line indent helper-text">For example, this will replace <code>:)</code>with ☺️, <code>:D</code>with 😃 and <code>:(</code>with ☹️.</span>
-					</li>
-
-					<li>
-						<div class="line">
-							<input class="setting save-on-change" type="checkbox" id="autocompleteEmojiShortcodes" data-optiongroup="autocorrect" name="autocompleteEmojiShortcodes">
-							<label data-i18n="" data-opt-i18n-keep-children for="autocompleteEmojiShortcodes">Autocomplete <code data-i18n="__MSG_optionCopyEmojiColonsCode__">:colon:</code>Emoji Shortcodes</label>
-						</div>
-						<span data-i18n="" class="line indent helper-text">For example, this will replace <code>:ap</code>with <code>:apple:.</code></span>
 						<ul>
 							<li>
 								<div class="line">
-									<input class="setting save-on-change" type="checkbox" id="autocompleteSelect" data-optiongroup="autocorrect" name="autocompleteSelect">
-									<label data-i18n="" for="autocompleteSelect">Always select the autocompletions for confirmation.</label>
+									<input class="setting save-on-change" type="checkbox" id="autocorrectEmojiShortcodes" data-optiongroup="autocorrect" name="autocorrectEmojiShortcodes">
+									<label data-i18n="" data-opt-i18n-keep-children for="autocorrectEmojiShortcodes">Autocorrect <code data-i18n="__MSG_optionCopyEmojiColonsCode__">:colon:</code>Emoji Shortcodes</label>
 								</div>
+								<span data-i18n="" class="line indent helper-text">For example, this will replace <code>:smiley:</code>with 😃 and <code>:apple:</code>with 🍎.</span>
+							</li>
+
+							<li>
+								<div class="line">
+									<input class="setting save-on-change" type="checkbox" id="autocorrectEmojis" data-optiongroup="autocorrect" name="autocorrectEmojis">
+									<label data-i18n="" for="autocorrectEmojis">Autocorrect Emoticon Emojis</label>
+								</div>
+								<span data-i18n="" class="line indent helper-text">For example, this will replace <code>:)</code>with ☺️, <code>:D</code>with 😃 and <code>:(</code>with ☹️.</span>
+							</li>
+
+							<li>
+								<div class="line">
+									<input class="setting save-on-change" type="checkbox" id="autocompleteEmojiShortcodes" data-optiongroup="autocorrect" name="autocompleteEmojiShortcodes">
+									<label data-i18n="" data-opt-i18n-keep-children for="autocompleteEmojiShortcodes">Autocomplete <code data-i18n="__MSG_optionCopyEmojiColonsCode__">:colon:</code>Emoji Shortcodes</label>
+								</div>
+								<span data-i18n="" class="line indent helper-text">For example, this will replace <code>:ap</code>with <code>:apple:.</code></span>
+								<ul>
+									<li>
+										<div class="line">
+											<input class="setting save-on-change" type="checkbox" id="autocompleteSelect" data-optiongroup="autocorrect" name="autocompleteSelect">
+											<label data-i18n="" for="autocompleteSelect">Always select the autocompletions for confirmation.</label>
+										</div>
+									</li>
+								</ul>
 							</li>
 						</ul>
 					</li>

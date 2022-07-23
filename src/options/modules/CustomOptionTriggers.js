@@ -87,6 +87,25 @@ function applyPickerResultPermissions(optionValue) {
  * @returns {Promise}
  */
 function applyAutocorrectPermissions(optionValue, option, event) {
+    if (optionValue.enabled) {
+        if (option && event?.target?.name === "enabled") {
+            if (!confirm("Are you sure you want to enable this experimental feature?")) {
+                // Remove once https://github.com/TinyWebEx/AutomaticSettings/issues/21 is fixed
+                event.target.checked = !optionValue.enabled;
+                return Promise.reject();
+            }
+        }
+        document.getElementById("autocorrectEmojiShortcodes").disabled = false;
+        document.getElementById("autocorrectEmojis").disabled = false;
+        document.getElementById("autocompleteEmojiShortcodes").disabled = false;
+        document.getElementById("autocompleteSelect").disabled = false;
+    } else {
+        document.getElementById("autocorrectEmojiShortcodes").disabled = true;
+        document.getElementById("autocorrectEmojis").disabled = true;
+        document.getElementById("autocompleteEmojiShortcodes").disabled = true;
+        document.getElementById("autocompleteSelect").disabled = true;
+    }
+
     let retPromise;
 
     if (!PermissionRequest.isPermissionGranted(TABS_PERMISSION) // and not already granted
