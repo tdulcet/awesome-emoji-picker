@@ -34,6 +34,15 @@ const defaultSettings = {
     contextMenu: {
         insertEmoji: true
     },
+    autocorrect: {
+        autocorrectEmojis: true,
+        autocorrectEmojiShortcodes: true,
+        autocompleteEmojiShortcodes: true,
+        autocompleteSelect: false,
+    },
+    contextMenu: {
+        insertEmoji: true
+    },
     emojiSearch: {
         enabled: false,
         resultType: "native",

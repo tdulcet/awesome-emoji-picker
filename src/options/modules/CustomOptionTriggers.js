@@ -16,12 +16,15 @@ import * as IconHandler from "/common/modules/IconHandler.js";
 const CLIPBOARD_WRITE_PERMISSION = {
     permissions: ["clipboardWrite"]
 };
+const TABS_PERMISSION = {
+    permissions: ["tabs"]
+};
 const MESSAGE_EMOJI_COPY_PERMISSION_SEARCH = "searchActionCopyPermissionInfo";
+const MESSAGE_TABS_PERMISSION = "tabsPermissionInfo";
 
 /**
  * Adjust UI if QR code size option is changed.
  *
- * @function
  * @private
  * @param  {boolean} optionValue
  * @param  {string} [option]
@@ -70,6 +73,38 @@ function applyPickerResultPermissions(optionValue) {
     } else {
         document.getElementById("emojiCopyOnlyFallback").disabled = true;
     }
+
+    return retPromise;
+}
+
+/**
+ * Requests the permission for autocorrect settings.
+ *
+ * @private
+ * @param  {Object} optionValue
+ * @param  {string} [option]
+ * @param  {Object} [event]
+ * @returns {Promise}
+ */
+function applyAutocorrectPermissions(optionValue, option, event) {
+    let retPromise;
+
+    if (!PermissionRequest.isPermissionGranted(TABS_PERMISSION) // and not already granted
+    ) {
+        retPromise = PermissionRequest.requestPermission(
+            TABS_PERMISSION,
+            MESSAGE_TABS_PERMISSION,
+            event
+        );
+    } else {
+        PermissionRequest.cancelPermissionPrompt(TABS_PERMISSION, MESSAGE_TABS_PERMISSION);
+    }
+
+    // trigger update for current session
+    browser.runtime.sendMessage({
+        "type": COMMUNICATION_MESSAGE_TYPE.AUTOCORRECT_BACKGROUND,
+        "optionValue": optionValue
+    });
 
     return retPromise;
 }
@@ -342,7 +377,6 @@ function applyEmojiSearch(optionValue, option, event = {}) {
  *
  * This is basically the "init" method.
  *
- * @function
  * @returns {Promise}
  */
 export async function registerTrigger() {
@@ -356,13 +390,18 @@ export async function registerTrigger() {
 
     // update slider status
     AutomaticSettings.Trigger.registerSave("pickerResult", applyPickerResultPermissions);
+    AutomaticSettings.Trigger.registerSave("autocorrect", applyAutocorrectPermissions);
     AutomaticSettings.Trigger.registerSave("contextMenu", applyContextMenuSettings);
     AutomaticSettings.Trigger.registerSave("popupIconColored", applyPopupIconColor);
     AutomaticSettings.Trigger.registerSave("emojiPicker", updatePerLineStatus);
     AutomaticSettings.Trigger.registerSave("emojiPicker", updateEmojiPerLineMaxViaEmojiSize);
     // Thunderbird
     if (typeof messenger !== "undefined") {
-        document.getElementById("browser").style.display = "none";
+        // document.getElementById("browser").style.display = "none";
+        document.getElementById("browser").disabled = true;
+        document.getElementById("omnibarIntegration").disabled = true;
+        document.getElementById("searchCopyAction").disabled = true;
+        document.getElementById("emojipediaAction").disabled = true;
     } else {
         AutomaticSettings.Trigger.registerSave("emojiSearch", applyEmojiSearch);
     }
@@ -376,5 +415,12 @@ export async function registerTrigger() {
         MESSAGE_EMOJI_COPY_PERMISSION_SEARCH,
         document.getElementById("searchActionCopyPermissionInfo"),
         "permissionRequiredClipboardWrite"
+    );
+    await PermissionRequest.registerPermissionMessageBox(
+        TABS_PERMISSION,
+        MESSAGE_TABS_PERMISSION,
+        document.getElementById("tabsPermissionInfo"),
+        // "permissionRequiredTabs" // This will need to be localized
+        "Permission to send any updated options to your open tabs is required to prevent you having to reload all of them manually."
     );
 }
