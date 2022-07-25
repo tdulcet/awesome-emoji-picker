@@ -24,6 +24,8 @@ let antipatterns = null;
 
 let emojiShortcodes = {};
 
+let running = false;
+
 /**
  * Get caret position.
  *
@@ -66,7 +68,7 @@ function getCaretPosition(target) {
 function insertAtCaret(target, atext) {
 	// document.execCommand is deprecated, although there is not yet an alternative: https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand
 	// insertReplacementText
-	if(document.execCommand("insertText", false, atext)) {
+	if (document.execCommand("insertText", false, atext)) {
 		return;
 	}
 
@@ -75,7 +77,7 @@ function insertAtCaret(target, atext) {
 		const start = target.selectionStart;
 		const end = target.selectionEnd;
 
-		if (start !== undefined && end !== undefined) {
+		if (start != null && end != null) {
 			target.setRangeText(atext);
 
 			target.selectionStart = target.selectionEnd = start + atext.length;
@@ -206,6 +208,10 @@ function autocorrect(event) {
 	if (!symbolpatterns) {
 		throw new Error("Emoji autocorrect settings have not been received. Do not autocorrect.");
 	}
+	if (running) {
+		return;
+	}
+	running = true;
 	const target = event.target;
 	const caretposition = getCaretPosition(target);
 	if (caretposition) {
@@ -240,9 +246,12 @@ function autocorrect(event) {
 					if (aregexResult.length >= 1 && (regexResult[0].length > 2 || aregexResult[0].length === 3)) {
 						const ainsert = aregexResult[0].slice(regexResult[0].length);
 						if (autocompleteSelect || aregexResult.length > 1) {
+							event.preventDefault();
+
+							insertAtCaret(target, inserted);
 							insertAndSelect(target, ainsert);
 						} else {
-							insert = ainsert;
+							insert = inserted + ainsert;
 							output = true;
 						}
 					}
@@ -254,6 +263,7 @@ function autocorrect(event) {
 
 			const text = deletecount ? value.slice(caretposition - deletecount, caretposition) : "";
 			if (text) {
+				lastTarget = null;
 				deleteCaret(target, text);
 			}
 			insertAtCaret(target, insert);
@@ -264,8 +274,14 @@ function autocorrect(event) {
 
 			lastTarget = target;
 			lastCaretPosition = caretposition - deletecount + insert.length;
+
+			if (deletedText && insertedText.startsWith(deletedText)) {
+				insertedText = insertedText.slice(deletedText.length);
+				deletedText = "";
+			}
 		}
 	}
+	running = false;
 }
 
 /**
@@ -280,6 +296,10 @@ function undoAutocorrect(event) {
 	if (event.inputType !== "deleteContentBackward") {
 		return;
 	}
+	if (running) {
+		return;
+	}
+	running = true;
 	const target = event.target;
 	const caretposition = getCaretPosition(target);
 	if (caretposition) {
@@ -298,6 +318,7 @@ function undoAutocorrect(event) {
 
 		lastTarget = null;
 	}
+	running = false;
 }
 
 /**

@@ -22,6 +22,14 @@ const TABS_PERMISSION = {
 const MESSAGE_EMOJI_COPY_PERMISSION_SEARCH = "searchActionCopyPermissionInfo";
 const MESSAGE_TABS_PERMISSION = "tabsPermissionInfo";
 
+// Thunderbird
+// https://bugzilla.mozilla.org/show_bug.cgi?id=1641573
+const IS_THUNDERBIRD = typeof messenger !== "undefined";
+
+// Chrome
+// Adapted from: https://github.com/mozilla/webextension-polyfill/blob/master/src/browser-polyfill.js
+const IS_CHROME = Object.getPrototypeOf(browser) !== Object.prototype;
+
 /**
  * Adjust UI if QR code size option is changed.
  *
@@ -89,7 +97,8 @@ function applyPickerResultPermissions(optionValue) {
 function applyAutocorrectPermissions(optionValue, option, event) {
     if (optionValue.enabled) {
         if (option && event?.target?.name === "enabled") {
-            if (!confirm("Are you sure you want to enable this experimental feature?")) {
+            // Remove IS_THUNDERBIRD once https://bugzilla.mozilla.org/show_bug.cgi?id=1780977 is fixed
+            if (!IS_THUNDERBIRD && !IS_CHROME && !confirm("Are you sure you want to enable this experimental feature?")) {
                 // Remove once https://github.com/TinyWebEx/AutomaticSettings/issues/21 is fixed
                 event.target.checked = !optionValue.enabled;
                 return Promise.reject();
@@ -415,7 +424,7 @@ export async function registerTrigger() {
     AutomaticSettings.Trigger.registerSave("emojiPicker", updatePerLineStatus);
     AutomaticSettings.Trigger.registerSave("emojiPicker", updateEmojiPerLineMaxViaEmojiSize);
     // Thunderbird
-    if (typeof messenger !== "undefined") {
+    if (IS_THUNDERBIRD) {
         // document.getElementById("browser").style.display = "none";
         document.getElementById("browser").disabled = true;
         document.getElementById("omnibarIntegration").disabled = true;
