@@ -97,6 +97,7 @@ function applyPickerResultPermissions(optionValue) {
 function applyAutocorrectPermissions(optionValue, option, event) {
     if (optionValue.enabled) {
         if (option && event?.target?.name === "enabled") {
+            // TODO: This will need to be localized
             // Remove IS_THUNDERBIRD once https://bugzilla.mozilla.org/show_bug.cgi?id=1780977 is fixed
             if (!IS_THUNDERBIRD && !IS_CHROME && !confirm("Are you sure you want to enable this experimental feature?")) {
                 // Remove once https://github.com/TinyWebEx/AutomaticSettings/issues/21 is fixed
@@ -448,7 +449,7 @@ export async function registerTrigger() {
         TABS_PERMISSION,
         MESSAGE_TABS_PERMISSION,
         document.getElementById("tabsPermissionInfo"),
-        // "permissionRequiredTabs" // This will need to be localized
+        // "permissionRequiredTabs" // TODO: This will need to be localized
         "Permission to send any updated options to your open tabs is required to prevent you having to reload all of them manually."
     );
 }
