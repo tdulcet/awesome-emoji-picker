@@ -26,11 +26,15 @@ let emojiShortcodes = {};
 
 let running = false;
 
+// Chrome
+// Adapted from: https://github.com/mozilla/webextension-polyfill/blob/master/src/browser-polyfill.js
+const IS_CHROME = Object.getPrototypeOf(browser) !== Object.prototype;
+
 /**
  * Get caret position.
  *
- * @param {Object} target
- * @returns {number}
+ * @param {HTMLElement} target
+ * @returns {number|null}
  */
 function getCaretPosition(target) {
 	// ContentEditable elements
@@ -44,23 +48,21 @@ function getCaretPosition(target) {
 		const temp = document.createTextNode("\0");
 		range.insertNode(temp);
 		const caretposition = target.innerText.indexOf("\0");
-		temp.parentNode.removeChild(temp);
+		temp.remove();
 		return caretposition;
 	}
 	// input and textarea fields
-	else {
-		if (target.selectionStart !== target.selectionEnd) {
-			return null;
-		}
-		return target.selectionStart;
+	if (target.selectionStart !== target.selectionEnd) {
+		return null;
 	}
+	return target.selectionStart;
 }
 
 /**
  * Insert at caret in the given element.
  * Adapted from: https://www.everythingfrontend.com/posts/insert-text-into-textarea-at-cursor-position.html
  *
- * @param {Object} target
+ * @param {HTMLElement} target
  * @param {string} atext
  * @throws {Error} if nothing is selected
  * @returns {void}
@@ -97,7 +99,7 @@ function insertAtCaret(target, atext) {
 /**
  * Insert at caret in the given element and select.
  *
- * @param {Object} target
+ * @param {HTMLElement} target
  * @param {string} atext
  * @returns {void}
  */
@@ -127,6 +129,7 @@ function insertIntoPage(atext) {
 /**
  * Count Unicode characters.
  * Adapted from: https://blog.jonnew.com/posts/poo-dot-length-equals-two
+ * Intl.Segmenter is not yet supported by Firefox/Thunderbird: https://bugzilla.mozilla.org/show_bug.cgi?id=1423593
  *
  * @param {string} str
  * @returns {number}
@@ -138,7 +141,7 @@ function countChars(str) {
 
 	for (const s of split) {
 		// removing the variation selectors
-		count += Array.from(s.split(/[\ufe00-\ufe0f]/).join("")).length;
+		count += Array.from(s.replaceAll(/[\uFE00-\uFE0F]/gu, "")).length;
 	}
 
 	return count;
@@ -147,7 +150,7 @@ function countChars(str) {
 /**
  * Delete at caret.
  *
- * @param {Object} target
+ * @param {HTMLElement} target
  * @param {string} atext
  * @returns {void}
  */
@@ -177,27 +180,9 @@ function deleteCaret(target, atext) {
 }
 
 /**
- * Get first difference index.
- *
- * @param {string} a
- * @param {string} b
- * @returns {number}
- */
-function firstDifferenceIndex(a, b) {
-	if (a === b) {
-		return -1;
-	}
-	let i = 0;
-	while (a[i] === b[i]) {
-		++i;
-	}
-	return i;
-}
-
-/**
  * Autocorrect on text input even by evaluating the keys and replacing the characters/string.
  *
- * @param {Object} event
+ * @param {InputEvent} event
  * @returns {void}
  */
 function autocorrect(event) {
@@ -237,7 +222,7 @@ function autocorrect(event) {
 			// Autocomplete :colon: Emoji Shortcodes
 			if (autocomplete) {
 				// Emoji Shortcode
-				const re = /:[a-z0-9-+_]+$/;
+				const re = /:[a-z0-9-+_]+$/u;
 				const length = longest - 2;
 				const text = value.slice(caretposition < length ? 0 : caretposition - length, caretposition) + inserted;
 				const regexResult = re.exec(text);
@@ -287,7 +272,7 @@ function autocorrect(event) {
 /**
  * Undo autocorrect in case the backspace has been pressed.
  *
- * @param {Object} event
+ * @param {InputEvent} event
  * @returns {void}
  */
 function undoAutocorrect(event) {
@@ -337,17 +322,17 @@ function handleResponse(message, sender) {
 	autocompleteSelect = message.autocompleteSelect;
 	autocorrections = message.autocorrections;
 	longest = message.longest;
-	symbolpatterns = message.symbolpatterns;
-	antipatterns = message.antipatterns;
+	symbolpatterns = IS_CHROME ? new RegExp(message.symbolpatterns, "u") : message.symbolpatterns;
+	antipatterns = IS_CHROME ? new RegExp(message.antipatterns, "u") : message.antipatterns;
 	emojiShortcodes = message.emojiShortcodes;
 	// console.log(message);
 
 	if (enabled) {
-		window.addEventListener("beforeinput", undoAutocorrect, true);
-		window.addEventListener("beforeinput", autocorrect, true);
+		addEventListener("beforeinput", undoAutocorrect, true);
+		addEventListener("beforeinput", autocorrect, true);
 	} else {
-		window.removeEventListener("beforeinput", undoAutocorrect, true);
-		window.removeEventListener("beforeinput", autocorrect, true);
+		removeEventListener("beforeinput", undoAutocorrect, true);
+		removeEventListener("beforeinput", autocorrect, true);
 	}
 }
 
@@ -361,6 +346,6 @@ function handleError(error) {
 	console.error(`Error: ${error}`);
 }
 
-browser.runtime.sendMessage({ "type": AUTOCORRECT_CONTENT }).then(handleResponse, handleError);
+browser.runtime.sendMessage({ type: AUTOCORRECT_CONTENT }).then(handleResponse, handleError);
 browser.runtime.onMessage.addListener(handleResponse);
 console.log("AwesomeEmoji autocorrect module loaded.");

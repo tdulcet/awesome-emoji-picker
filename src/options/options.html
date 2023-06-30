@@ -166,6 +166,16 @@
 				<span class="helper-text">With the exception of the smart quotes, all the autocorrections are done after typing the first nonmatching character following the character sequence, such as a space (␣). Press Backspace (⌫) to undo an autocorrection.</span><br>
 
 				<span class="helper-text">For Unicode Symbol autocorrection and Unicode font conversion from the context menu, please try our <strong>υ</strong> <a id="link-unicodify">Unicodify</a> add-on.</span>
+
+				<div class="message-container">
+					<div aria-label="warning message" data-i18n data-i18n-aria-label="__MSG_ariaMessageWarning__" class="message-box warning">
+						<span class="message-text" data-i18n="__MSG_optionWarningAutocorrectFeature__">The Emoji autocorrect feature is experimental and may negatively affect some web pages.</span>
+						<a href="https://github.com/rugk/unicodify/wiki/FAQ#why-is-the-autocorrect-feature-experimental" data-i18n-href="__MSG_optionWarningAutocorrectFeatureLink__" >
+							<button data-i18n="__MSG_optionMoreInformation__" type="button" class="message-action-button micro-button warning">More information</button>
+						</a>
+					</div>
+				</div>
+
 				<ul>
 					<div class="message-container line">
 						<div id="tabsPermissionInfo" aria-label="info message" data-i18n data-i18n-aria-label="__MSG_ariaMessageInfo__" class="message-box info invisible fade-hide">
@@ -182,7 +192,6 @@
 							<input class="setting save-on-change" type="checkbox" id="autocorrect" data-optiongroup="autocorrect" name="enabled">
 							<label for="autocorrect">Enable autocorrection</label>
 						</div>
-						<span class="line indent helper-text">Enable the experimental Enoji autocorrection feature. ⚠️ This is for testing only.</span>
 					</li>
 
 					<li>
@@ -219,20 +228,6 @@
 								</ul>
 							</li>
 						</ul>
-					</li>
-				</ul>
-			</section>
-
-			<!-- Remove "mobile-incompatible" once https://bugzilla.mozilla.org/show_bug.cgi?id=1595822 is fixed -->
-			<section class="mobile-incompatible">
-				<h1 data-i18n="">Context menu</h1>
-				<ul>
-					<li>
-						<div class="line">
-							<input class="setting save-on-change" type="checkbox" id="insertEmoji" data-optiongroup="contextMenu" name="insertEmoji">
-							<label data-i18n="" for="insertEmoji">Insert Emoji</label>
-						</div>
-						<span data-i18n="" class="line indent helper-text">Show context menu item to insert emoji.</span>
 					</li>
 				</ul>
 			</section>

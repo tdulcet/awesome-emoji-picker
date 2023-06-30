@@ -32,6 +32,13 @@
   "background": {
     "page": "background/background.html"
   },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "all_frames": true,
+      "js": ["content_scripts/autocorrect.js"]
+    }
+  ],
   "commands": {
     "_execute_compose_action": {
       "suggested_key": {

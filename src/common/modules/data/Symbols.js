@@ -8,8 +8,8 @@
  * @type {Object.<string, string>}
  */
 export const emojis = Object.freeze({
-    "100": "💯",
-    "ZZZ": "💤",
+    100: "💯",
+    ZZZ: "💤",
     "<!>": "⚠️",
     "(-)": "⛔",
     "(\\)": "🚫", // (\)
@@ -17,13 +17,13 @@ export const emojis = Object.freeze({
     "[]": "⬜",
     "()": "⚪",
     // "!?": "⁉️",
-    "COOL": "🆒",
+    COOL: "🆒",
     "[COOL]": "🆒",
-    "FREE": "🆓",
+    FREE: "🆓",
     "[FREE]": "🆓",
-    "NEW": "🆕",
+    NEW: "🆕",
     "[NEW]": "🆕",
-    "SOS": "🆘",
+    SOS: "🆘",
     "[SOS]": "🆘",
     "UP!": "🆙",
     "[UP!]": "🆙",
