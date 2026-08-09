@@ -289,7 +289,7 @@ if (!globalThis.__awesomeEmojiPickerAutocorrectLoaded) {
         target.selectionStart = start;
         target.selectionEnd = end;
 
-        // "insertReplacementText"
+        // alternative for the future: "insertReplacementText"
         return insertAtCaret(target, insertText);
     }
 
